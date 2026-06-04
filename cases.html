@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>悟空 · 最佳实践案例库</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F8FA;
+    --bg-card: #FFFFFF;
+    --bg-tag: #F1F4F9;
+    --bg-tag-hover: #E8EDF5;
+    --bg-tag-active: #EEF2FF;
+    --bg-raised: #FBFCFE;
+    --text: #0B1120;
+    --text-secondary: #364153;
+    --text-dim: #64748B;
+    --text-muted: #94A3B8;
+    --accent: #2563EB;
+    --accent-hover: #1D4ED8;
+    --accent-soft: #EFF6FF;
+    --accent-ring: #BFDBFE;
+    --border: #E2E8F0;
+    --border-soft: #EDF2F7;
+    --green: #059669;
+    --green-soft: #ECFDF5;
+    --green-ring: #A7F3D0;
+    --amber: #D97706;
+    --amber-soft: #FFFBEB;
+    --amber-ring: #FDE68A;
+    --purple: #7C3AED;
+    --purple-soft: #F5F3FF;
+    --purple-ring: #DDD6FE;
+    --rose: #E11D48;
+    --rose-soft: #FFF1F2;
+    --cyan: #0891B2;
+    --cyan-soft: #ECFEFF;
+    --radius: 14px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --radius-pill: 100px;
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-xl: -8px 0 40px rgba(15,23,42,0.12);
+    --transition: 180ms cubic-bezier(0.4,0,0.2,1);
+    --transition-slow: 320ms cubic-bezier(0.4,0,0.2,1);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 1px 1px, #DDE1E8 1px, transparent 0);
+    background-size: 28px 28px;
+    opacity: 0.45;
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 12px 28px;
+    display: flex; align-items: center; gap: 28px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -1px;
+  }
+  .logo-text { font-size: 17px; font-weight: 650; letter-spacing: -0.4px; color: var(--text); }
+  .logo-text span { color: var(--accent); font-weight: 700; }
+
+  /* ============ TAB NAV ============ */
+  .tab-nav {
+    display: flex; gap: 3px;
+    padding: 4px; background: var(--bg-tag); border-radius: var(--radius-md);
+  }
+  .tab-btn {
+    padding: 8px 22px; font-size: 13px; font-weight: 500;
+    border: none; border-radius: 7px; cursor: pointer;
+    background: transparent; color: var(--text-dim);
+    transition: var(--transition); font-family: var(--font);
+    white-space: nowrap; position: relative;
+  }
+  .tab-btn.active {
+    background: var(--bg-card); color: var(--text);
+    box-shadow: var(--shadow-sm); font-weight: 600;
+  }
+  .tab-btn:hover:not(.active) { color: var(--text-secondary); background: rgba(255,255,255,0.55); }
+  .tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    font-size: 10px; font-weight: 700; padding: 0 6px;
+    margin-left: 6px; background: var(--accent); color: #fff;
+  }
+
+  /* ============ CONTAINER ============ */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 280ms ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ============ STATS HERO (browse) ============ */
+  .stats-hero {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    padding: 32px 0 24px;
+  }
+  .stat-card {
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    border-radius: var(--radius); padding: 22px 24px;
+    display: flex; align-items: center; gap: 16px;
+    transition: var(--transition);
+  }
+  .stat-card:hover {
+    border-color: var(--accent-ring);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  .stat-icon {
+    width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .stat-icon.blue { background: var(--accent-soft); color: var(--accent); }
+  .stat-icon.green { background: var(--green-soft); color: var(--green); }
+  .stat-icon.amber { background: var(--amber-soft); color: var(--amber); }
+  .stat-icon.purple { background: var(--purple-soft); color: var(--purple); }
+  .stat-icon.rose { background: var(--rose-soft); color: var(--rose); }
+  .stat-icon.cyan { background: var(--cyan-soft); color: var(--cyan); }
+  .stat-num { font-size: 26px; font-weight: 700; letter-spacing: -0.6px; line-height: 1.15; color: var(--text); }
+  .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 3px; font-weight: 500; }
+
+  /* ============ TOOLBAR (search + upload btn) ============ */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; gap: 16px; flex-wrap: wrap;
+  }
+  .toolbar-label { font-size: 13px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.5px; flex-shrink: 0; }
+
+  .search-wrap {
+    position: relative; flex: 1; min-width: 240px; max-width: 420px;
+  }
+  .search-wrap svg.search-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; z-index: 1;
+  }
+  .search-input {
+    width: 100%; padding: 10px 14px 10px 40px;
+    font-size: 13px; font-family: var(--font); color: var(--text);
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-md); outline: none;
+    transition: var(--transition);
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+  }
+
+  /* ============ UPLOAD TAG BTN ============ */
+  .upload-tag-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 18px; font-size: 12.5px; font-weight: 600;
+    border: 1.5px solid var(--accent-ring); border-radius: var(--radius-pill);
+    cursor: pointer; background: var(--accent-soft); color: var(--accent);
+    transition: var(--transition); font-family: var(--font);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .upload-tag-btn:hover {
+    background: var(--accent); color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 2px 12px rgba(37,99,235,0.28);
+    transform: translateY(-1px);
+  }
+  .upload-tag-btn:active { transform: translateY(0); }
+
+  /* ============ FILTERS ============ */
+  .filter-section {
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    border-radius: var(--radius); padding: 18px 24px; margin-bottom: 20px;
+    box-shadow: var(--shadow-xs);
+  }
+  .filter-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .filter-row:last-child { margin-bottom: 0; }
+  .filter-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding-top: 8px; min-width: 36px; flex-shrink: 0;
+  }
+  .filter-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    padding: 6px 15px; font-size: 12px; font-weight: 500; border-radius: var(--radius-pill);
+    border: 1px solid var(--border); background: var(--bg-tag);
+    color: var(--text-dim); cursor: pointer; user-select: none;
+    transition: var(--transition); white-space: nowrap;
+  }
+  .tag:hover { border-color: var(--accent-ring); color: var(--accent); background: #FAFBFF; }
+  .tag.active {
+    background: var(--accent-soft); color: var(--accent);
+    border-color: var(--accent-ring); font-weight: 600;
+    box-shadow: 0 0 0 1px rgba(37,99,235,0.08);
+  }
+  .filter-reset {
+    padding: 5px 14px; font-size: 12px; color: var(--text-muted);
+    background: none; border: none; cursor: pointer; transition: var(--transition);
+    font-family: var(--font); font-weight: 500;
+  }
+  .filter-reset:hover { color: var(--rose); }
+  .filter-reset.hidden { visibility: hidden; }
+
+  /* ============ RESULTS BAR ============ */
+  .results-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .results-count { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+  .results-count strong { color: var(--text); font-weight: 650; }
+  .results-count .sep { color: var(--border); margin: 0 10px; }
+
+  /* ============ CARDS GRID ============ */
+  .cases-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    padding-bottom: 64px;
+  }
+  .case-card {
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    border-radius: var(--radius); padding: 26px 26px 22px;
+    cursor: pointer; transition: var(--transition);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 12px;
+    box-shadow: var(--shadow-xs);
+  }
+  .case-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: linear-gradient(180deg, var(--accent) 0%, #6366F1 100%);
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0); transition: transform 280ms cubic-bezier(0.34,1.56,0.64,1);
+    transform-origin: top;
+  }
+  .case-card:hover {
+    border-color: var(--accent-ring);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .case-card:hover::before { transform: scaleY(1); }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .card-industry {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.7px;
+    background: var(--accent-soft); padding: 3px 10px; border-radius: var(--radius-pill);
+  }
+  .card-id {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    background: var(--bg-tag); border-radius: 6px; padding: 3px 8px;
+    flex-shrink: 0; letter-spacing: 0.3px;
+  }
+  .card-title {
+    font-size: 15px; font-weight: 650; color: var(--text);
+    line-height: 1.4; letter-spacing: -0.2px;
+  }
+  .card-client {
+    font-size: 12.5px; color: var(--text-dim); font-weight: 500;
+  }
+  .card-divider {
+    height: 1px; background: var(--border-soft); margin: 0;
+  }
+  .card-summary {
+    font-size: 13px; color: var(--text-dim); line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden; flex: 1;
+  }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .card-tag {
+    font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill);
+    background: var(--bg-tag); color: var(--text-dim); font-weight: 500;
+    border: 1px solid transparent;
+    transition: var(--transition);
+  }
+  .case-card:hover .card-tag { border-color: var(--border); }
+  /* Card action buttons */
+  .card-actions {
+    position: absolute; bottom: 16px; right: 16px;
+    display: flex; gap: 6px; opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 200ms ease, transform 200ms ease;
+    z-index: 2;
+  }
+  .case-card:hover .card-actions {
+    opacity: 1; transform: translateY(0);
+  }
+  .card-act-btn {
+    width: 30px; height: 30px; border-radius: 8px;
+    border: 1px solid var(--border-soft);
+    background: var(--bg-card);
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: var(--transition);
+    color: var(--text-muted);
+  }
+  .card-act-btn svg { width: 14px; height: 14px; }
+  .card-act-btn.edit:hover {
+    background: var(--accent-soft); color: var(--accent);
+    border-color: var(--accent-ring);
+  }
+  .card-act-btn.del:hover {
+    background: #FEF2F2; color: #DC2626;
+    border-color: #FECACA;
+  }
+  /* Confirm dialog */
+  .confirm-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.4);
+    backdrop-filter: blur(3px); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 240ms ease;
+  }
+  .confirm-overlay.show { opacity: 1; pointer-events: auto; }
+  .confirm-box {
+    background: #fff; border-radius: 16px; padding: 28px 32px 24px;
+    max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+  .confirm-box h3 { font-size: 16px; font-weight: 650; color: #0B1120; margin-bottom: 8px; letter-spacing: -0.3px; }
+  .confirm-box p { font-size: 13.5px; color: #64748B; line-height: 1.6; margin-bottom: 22px; }
+  .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+  .confirm-actions .btn-cancel {
+    padding: 9px 22px; border-radius: 10px; border: 1px solid #E2E8F0;
+    background: #fff; color: #64748B; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; transition: all 180ms ease;
+  }
+  .confirm-actions .btn-cancel:hover { background: #F8FAFC; }
+  .confirm-actions .btn-danger {
+    padding: 9px 22px; border-radius: 10px; border: none;
+    background: #DC2626; color: #fff; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; transition: all 180ms ease;
+  }
+  .confirm-actions .btn-danger:hover { background: #B91C1C; }
+
+
+  /* ============ EMPTY STATE ============ */
+  .empty-state {
+    text-align: center; padding: 80px 20px;
+    grid-column: 1 / -1;
+  }
+  .empty-state-box {
+    width: 64px; height: 64px; margin: 0 auto 20px;
+    border-radius: 50%; background: var(--bg-tag);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--text-muted);
+  }
+  .empty-state h3 { font-size: 16px; font-weight: 650; margin-bottom: 6px; color: var(--text); }
+  .empty-state p { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
+
+  /* ============ OVERLAY & DRAWER ============ */
+  .overlay {
+    position: fixed; inset: 0;
+    z-index: 99; opacity: 0; pointer-events: none;
+    transition: opacity 280ms ease;
+  }
+  .overlay::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(15,23,42,0.35);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .overlay.show { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed; top: 0; right: 0; width: 640px; max-width: 100vw;
+    height: 100vh; background: var(--bg-card); z-index: 100;
+    box-shadow: var(--shadow-xl);
+    transform: translateX(100%); transition: transform 360ms cubic-bezier(0.32,0.72,0,1);
+    display: flex; flex-direction: column;
+  }
+  .drawer.show { transform: translateX(0); }
+  .drawer-header {
+    padding: 24px 32px; border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-shrink: 0;
+  }
+  .drawer-header h2 { font-size: 18px; font-weight: 650; letter-spacing: -0.3px; line-height: 1.4; }
+  .drawer-close {
+    width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--bg-card); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: var(--transition); flex-shrink: 0;
+  }
+  .drawer-close:hover { background: var(--bg-tag); border-color: var(--text-muted); }
+  .drawer-close svg { width: 16px; height: 16px; color: var(--text-dim); }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 32px; }
+  .drawer-body::-webkit-scrollbar { width: 5px; }
+  .drawer-body::-webkit-scrollbar-track { background: transparent; }
+  .drawer-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .d-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .d-meta-tag { font-size: 12px; padding: 5px 14px; border-radius: var(--radius-pill); font-weight: 600; }
+  .d-meta-tag.industry { background: var(--accent-soft); color: var(--accent); }
+  .d-meta-tag.scenario { background: var(--green-soft); color: var(--green); }
+  .d-meta-tag.feature { background: var(--purple-soft); color: var(--purple); }
+  .d-block { margin-bottom: 28px; }
+  .d-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+  .d-text { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .d-list { list-style: none; display: grid; gap: 10px; }
+  .d-list li {
+    font-size: 14px; color: var(--text-secondary); padding: 13px 16px 13px 40px;
+    position: relative; line-height: 1.6; background: var(--bg);
+    border-radius: var(--radius-sm); border: 1px solid var(--border-soft);
+  }
+  .d-list li::before {
+    content: ''; position: absolute; left: 16px; top: 19px;
+    width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  }
+  .d-highlight {
+    background: linear-gradient(135deg, #EEF2FF 0%, #ECFDF5 100%);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 26px;
+  }
+  .d-highlight .d-label { color: var(--accent); }
+  .d-screenshot {
+    text-align: center; padding: 56px 20px;
+    border: 1.5px dashed var(--border); border-radius: var(--radius);
+    background: var(--bg); color: var(--text-muted); font-size: 13px;
+  }
+  .d-screenshot.has-image { padding: 0; border: none; background: none; }
+  .d-screenshot img { width: 100%; border-radius: var(--radius); display: block; }
+
+  /* ============ CARD ANIMATION ============ */
+  .case-card { animation: fadeUp 420ms ease both; }
+  .case-card:nth-child(1) { animation-delay: 0ms; }
+  .case-card:nth-child(2) { animation-delay: 50ms; }
+  .case-card:nth-child(3) { animation-delay: 90ms; }
+  .case-card:nth-child(4) { animation-delay: 110ms; }
+  .case-card:nth-child(5) { animation-delay: 130ms; }
+  .case-card:nth-child(6) { animation-delay: 150ms; }
+  .case-card:nth-child(7) { animation-delay: 170ms; }
+  .case-card:nth-child(8) { animation-delay: 190ms; }
+  .case-card:nth-child(9) { animation-delay: 210ms; }
+  .case-card:nth-child(10) { animation-delay: 230ms; }
+  .case-card:nth-child(11) { animation-delay: 250ms; }
+  .case-card:nth-child(12) { animation-delay: 270ms; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ DASHBOARD STYLES ============ */
+  .dash-hero {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+    padding: 32px 0 20px;
+  }
+  .dash-section {
+    background: var(--bg-card); border: 1px solid var(--border-soft);
+    border-radius: var(--radius); padding: 26px; margin-bottom: 16px;
+    box-shadow: var(--shadow-xs);
+  }
+  .dash-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  .dash-section-title {
+    font-size: 15px; font-weight: 650; letter-spacing: -0.3px;
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text);
+  }
+  .dash-section-sub {
+    font-size: 12px; color: var(--text-muted); font-weight: 500;
+  }
+  .dash-grid-2 { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+
+  /* Chart */
+  .chart-container { position: relative; padding-top: 8px; }
+  .chart-tooltip {
+    position: absolute; pointer-events: none; opacity: 0;
+    background: var(--text); color: #fff; padding: 7px 14px;
+    border-radius: 7px; font-size: 12px; font-weight: 600;
+    white-space: nowrap; z-index: 10; transition: opacity 150ms ease;
+    transform: translate(-50%, -120%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .chart-tooltip.show { opacity: 1; }
+  .chart-bar { transition: all 200ms ease; cursor: pointer; }
+  .chart-bar:hover { opacity: 1 !important; filter: brightness(1.12) saturate(1.1); }
+
+  /* Leaderboard */
+  .lb-row {
+    display: flex; align-items: center; gap: 12px; padding: 11px 0;
+    border-bottom: 1px solid var(--border-soft);
+    transition: var(--transition); cursor: pointer;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover {
+    background: var(--bg); margin: 0 -12px; padding-left: 12px; padding-right: 12px;
+    border-radius: 7px;
+  }
+  .lb-rank {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .lb-rank.top1 { background: #FEF3C7; color: #B45309; }
+  .lb-rank.top2 { background: #F1F5F9; color: #64748B; }
+  .lb-rank.top3 { background: #FDE8E8; color: #C2410C; }
+  .lb-rank.normal { background: var(--bg-tag); color: var(--text-muted); }
+  .lb-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .lb-bar-wrap { width: 100px; height: 6px; background: var(--bg-tag); border-radius: 3px; overflow: hidden; }
+  .lb-bar-fill { height: 100%; border-radius: 3px; transition: width 600ms cubic-bezier(0.34,1.56,0.64,1); }
+  .lb-count { font-size: 13px; font-weight: 650; min-width: 32px; text-align: right; color: var(--text); }
+
+  /* Dashboard Info Card (right column) */
+  .info-card {
+    background: linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);
+    border: 1px solid var(--accent-ring); border-radius: var(--radius);
+    padding: 26px; display: flex; flex-direction: column; gap: 20px;
+  }
+  .info-card h4 {
+    font-size: 14px; font-weight: 650; color: var(--accent);
+    display: flex; align-items: center; gap: 8px; letter-spacing: -0.2px;
+  }
+  .info-card .info-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+  }
+  .info-card .info-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    margin-top: 7px; flex-shrink: 0;
+  }
+
+  /* Quick Upload Form */
+  .upload-drawer-body { display: flex; flex-direction: column; gap: 16px; padding: 0; }
+  .quick-form { display: flex; flex-direction: column; gap: 14px; }
+  .quick-form .form-row { display: flex; gap: 12px; }
+  .quick-form .form-row.three-col > * { flex: 1; min-width: 0; }
+  .quick-form .form-row.two-col > * { flex: 1; min-width: 0; }
+  .quick-form .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .quick-form label {
+    font-size: 11px; font-weight: 700; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .quick-form input, .quick-form select, .quick-form textarea {
+    font-family: var(--font); font-size: 13px;
+    padding: 9px 13px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--bg-card);
+    color: var(--text); outline: none;
+    transition: var(--transition);
+  }
+  .quick-form input:focus, .quick-form select:focus, .quick-form textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+  }
+  .quick-form textarea { resize: vertical; min-height: 72px; }
+  .quick-form .form-actions {
+    display: flex; gap: 10px; margin-top: 8px;
+  }
+  .quick-form .btn {
+    padding: 10px 26px; font-size: 13px; font-weight: 600;
+    border-radius: var(--radius-sm); border: none; cursor: pointer;
+    font-family: var(--font); transition: var(--transition);
+  }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(37,99,235,0.35); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-outline {
+    background: var(--bg-card); color: var(--text-dim);
+    border: 1px solid var(--border); font-weight: 500;
+  }
+  .btn-outline:hover { background: var(--bg-tag); border-color: var(--text-muted); color: var(--text-secondary); }
+
+  /* Image upload area */
+  .img-upload-area {
+    display: flex; align-items: center; justify-content: center;
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    cursor: pointer; transition: var(--transition);
+    position: relative; overflow: hidden;
+    min-height: 140px;
+  }
+  .img-upload-area:hover {
+    border-color: var(--accent-ring);
+    background: #FAFBFF;
+  }
+  .img-upload-area.has-image {
+    border-style: solid; border-color: var(--border-soft);
+    padding: 0; min-height: auto;
+  }
+  .img-upload-area.has-image img {
+    width: 100%; max-height: 260px; object-fit: contain;
+    display: block; border-radius: var(--radius-sm);
+  }
+  .img-upload-placeholder {
+    text-align: center; color: var(--text-muted);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; padding: 32px 20px;
+  }
+  .img-upload-placeholder svg { opacity: 0.4; }
+  .img-upload-placeholder span { font-size: 13px; font-weight: 500; }
+  .img-upload-placeholder small { font-size: 11px; color: var(--text-muted); opacity: 0.7; }
+  .img-upload-remove {
+    position: absolute; top: 8px; right: 8px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(0,0,0,0.55); color: #fff; border: none;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: 16px; line-height: 1;
+    opacity: 0; transition: opacity 180ms ease; z-index: 2;
+  }
+  .img-upload-area.has-image:hover .img-upload-remove { opacity: 1; }
+  .img-upload-area.avatar { min-height: 100px; width: 120px; max-width: 100%; border-radius: 50%; }
+  .img-upload-area.avatar.has-image { border-radius: 50%; overflow: hidden; }
+  .img-upload-area.avatar.has-image img {
+    width: 100%; height: 100%; object-fit: cover;
+    aspect-ratio: 1;
+  }
+
+  .form-toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-12px);
+    padding: 13px 30px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
+    z-index: 999; transition: opacity 300ms ease, transform 300ms ease;
+    opacity: 0; pointer-events: none; box-shadow: var(--shadow-lg);
+  }
+  .form-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .form-toast.success { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+  .form-toast.error { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    text-align: center; padding: 32px 0 40px;
+    font-size: 12.5px; color: var(--text-muted); font-weight: 500;
+    border-top: 1px solid var(--border-soft);
+    letter-spacing: 0.3px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  /* Tablet (768-1100px) */
+  @media (max-width: 1100px) {
+    .container { padding: 0 20px; }
+    .header-inner { padding: 12px 20px; }
+    .stats-hero, .dash-hero { grid-template-columns: repeat(2, 1fr); }
+    .cases-grid { grid-template-columns: repeat(2, 1fr); }
+    .drawer { width: 520px; }
+    .dash-grid-2 { grid-template-columns: 1fr; }
+    .stat-num { font-size: 24px; }
+    .stat-card { padding: 18px 20px; }
+  }
+
+  /* Mobile (<768px) */
+  @media (max-width: 767px) {
+    /* Header */
+    .header-inner {
+      flex-wrap: wrap; padding: 10px 14px; gap: 8px;
+    }
+    .logo-icon { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+    .logo-text { font-size: 15px; }
+    .tab-nav { width: 100%; order: 3; justify-content: stretch; }
+    .tab-btn { flex: 1; text-align: center; padding: 8px 12px; font-size: 12px; }
+    .tab-badge { min-width: 16px; height: 16px; font-size: 9px; margin-left: 4px; }
+
+    /* Container */
+    .container { padding: 0 12px; }
+
+    /* Stats hero */
+    .stats-hero { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 18px 0 14px; }
+    .stat-card { padding: 14px 12px; gap: 10px; border-radius: var(--radius-md); }
+    .stat-icon { width: 36px; height: 36px; border-radius: 9px; font-size: 16px; }
+    .stat-num { font-size: 20px; }
+    .stat-label { font-size: 10px; margin-top: 1px; }
+
+    /* Dashboard hero */
+    .dash-hero { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 18px 0 12px; }
+    .dash-hero .stat-card { padding: 14px 12px; gap: 10px; }
+    .dash-hero .stat-icon { width: 36px; height: 36px; }
+    .dash-section { padding: 16px 14px; margin-bottom: 10px; }
+    .dash-section-title { font-size: 13.5px; }
+    .dash-grid-2 { grid-template-columns: 1fr; gap: 10px; }
+    .info-card { padding: 18px 16px; gap: 14px; }
+    .lb-bar-wrap { width: 50px; }
+
+    /* Toolbar */
+    .toolbar {
+      flex-direction: column; align-items: stretch; gap: 10px;
+      margin-bottom: 12px;
+    }
+    .search-wrap { max-width: none; flex: 1; }
+    .search-input { font-size: 14px; padding: 10px 12px 10px 38px; }
+    .upload-tag-btn { align-self: flex-end; }
+
+    /* Filter section */
+    .filter-section { padding: 12px 14px; margin-bottom: 12px; border-radius: var(--radius-md); }
+    .filter-row { flex-direction: column; gap: 4px; margin-bottom: 8px; }
+    .filter-label { padding-top: 0; font-size: 10px; }
+    .tag { padding: 5px 11px; font-size: 11px; }
+
+    /* Results bar */
+    .results-bar { flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .results-count { font-size: 11.5px; }
+    .results-count .sep { margin: 0 6px; }
+
+    /* Cards grid */
+    .cases-grid { grid-template-columns: 1fr; gap: 12px; padding-bottom: 48px; }
+    .case-card { padding: 20px 16px; gap: 10px; border-radius: var(--radius-md); }
+    .case-card::before { width: 3px; }
+    .card-title { font-size: 14px; }
+    .card-summary { font-size: 12.5px; -webkit-line-clamp: 2; }
+    .card-tag { font-size: 10px; padding: 2px 8px; }
+    .card-actions { bottom: 12px; right: 12px; opacity: 1; transform: none; }
+
+    /* Drawers - full screen on mobile */
+    .drawer { width: 100vw; max-width: 100vw; }
+    .drawer-header { padding: 16px 18px; }
+    .drawer-header h2 { font-size: 16px; }
+    .drawer-body { padding: 18px 16px; }
+    .d-block { margin-bottom: 22px; }
+    .d-text { font-size: 13px; line-height: 1.7; }
+    .d-list li { font-size: 13px; padding: 11px 12px 11px 32px; }
+    .d-list li::before { left: 12px; top: 16px; width: 6px; height: 6px; }
+    .d-screenshot { padding: 32px 16px; }
+
+    /* Upload form */
+    .quick-form { gap: 12px; }
+    .quick-form .form-row { flex-direction: column; gap: 8px; }
+    .quick-form .form-row.two-col > *,
+    .quick-form .form-row.three-col > * { width: 100%; }
+    .quick-form input, .quick-form select, .quick-form textarea {
+      font-size: 16px; padding: 10px 13px;
+    }
+    .quick-form textarea { min-height: 64px; }
+    .quick-form label { font-size: 10px; }
+    .form-actions { flex-direction: column; }
+    .form-actions .btn { width: 100%; padding: 12px; font-size: 14px; }
+    .form-actions .btn-outline { order: 1; }
+    .form-actions .btn-primary { order: 0; }
+
+    /* Image upload on mobile */
+    .img-upload-area { min-height: 120px; }
+    .img-upload-area.has-image img { max-height: 200px; }
+    .img-upload-area.avatar { width: 100px; min-height: 80px; }
+    .img-upload-remove { opacity: 1; }
+
+    /* Confirm dialog */
+    .confirm-box { padding: 22px 20px 18px; width: 92%; }
+    .confirm-actions { flex-direction: column-reverse; }
+    .confirm-actions .btn-cancel,
+    .confirm-actions .btn-danger { width: 100%; }
+
+    /* Toast */
+    .form-toast { width: 90%; font-size: 13px; padding: 11px 20px; }
+
+    /* Footer */
+    .footer { padding: 24px 0 32px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">W</div>
+      <div class="logo-text">悟空 <span>·</span> 最佳实践</div>
+    </div>
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="browse">案例浏览</button>
+      <button class="tab-btn" data-tab="dashboard">数据看板 <span class="tab-badge">●</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BROWSE TAB ============ -->
+<div class="tab-content active" id="tab-browse">
+<div class="container">
+
+  <div class="stats-hero" id="statsHero">
+    <div class="stat-card">
+      <div class="stat-icon blue">&#9998;</div>
+      <div><div class="stat-num" id="totalCount">12</div><div class="stat-label">精选案例</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">&#9632;</div>
+      <div><div class="stat-num" id="industryCount">9</div><div class="stat-label">覆盖行业</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">&#9670;</div>
+      <div><div class="stat-num" id="scenarioCount">8</div><div class="stat-label">应用场景</div></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="toolbar-label">筛选 & 浏览</span>
+    <button class="upload-tag-btn" onclick="openUploadDrawer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      上传案例
+    </button>
+  </div>
+
+  <div class="search-wrap">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+    </svg>
+    <input type="text" class="search-input" id="searchInput" placeholder="搜索案例标题、客户、场景描述...">
+  </div>
+
+  <div class="filter-section" id="filterSection">
+    <div class="filter-row" id="industryFilters">
+      <span class="filter-label">行业</span>
+      <div class="filter-tags"></div>
+    </div>
+    <div class="filter-row" id="scenarioFilters">
+      <span class="filter-label">场景</span>
+      <div class="filter-tags"></div>
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <div class="results-count" id="resultsCount">
+      共 <strong id="resultNum">12</strong> 个案例<span class="sep">|</span>最近更新：2026-06-03
+    </div>
+    <button class="filter-reset hidden" id="filterReset" onclick="clearAllFilters()">清除所有筛选</button>
+  </div>
+
+  <div class="cases-grid" id="casesGrid"></div>
+</div>
+</div>
+
+<!-- ============ DASHBOARD TAB ============ -->
+<div class="tab-content" id="tab-dashboard">
+<div class="container" style="padding-bottom:60px;">
+
+  <!-- Top stats row -->
+  <div class="dash-hero" id="dashStatsHero">
+    <div class="stat-card">
+      <div class="stat-icon blue">&#9998;</div>
+      <div>
+        <div class="stat-num" id="dashTotal">12</div>
+        <div class="stat-label">最佳实践总数</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">&#9650;</div>
+      <div>
+        <div class="stat-num" id="dashWeekNew">3</div>
+        <div class="stat-label">本周新增</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">&#9632;</div>
+      <div>
+        <div class="stat-num" id="dashIndustries">9</div>
+        <div class="stat-label">覆盖行业数</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon purple">&#9670;</div>
+      <div>
+        <div class="stat-num" id="dashScenarios">8</div>
+        <div class="stat-label">应用场景数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Industry distribution chart -->
+  <div class="dash-section">
+    <div class="dash-section-header">
+      <div class="dash-section-title">
+        <span style="display:inline-block;width:4px;height:16px;background:var(--accent);border-radius:2px;"></span>
+        各行业最佳实践分布
+        <span class="dash-section-sub">（案例数量）</span>
+      </div>
+    </div>
+    <div class="chart-container" id="chartContainer"></div>
+  </div>
+
+  <!-- Two-column: Leaderboard + Info -->
+  <div class="dash-grid-2">
+    <!-- Leaderboard -->
+    <div class="dash-section">
+      <div class="dash-section-header">
+        <div class="dash-section-title">
+          <span style="display:inline-block;width:4px;height:16px;background:var(--amber);border-radius:2px;"></span>
+          行业排行榜
+        </div>
+        <span class="dash-section-sub">Top 9 行业</span>
+      </div>
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="info-card">
+      <h4>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        案例库说明
+      </h4>
+      <div class="info-row">
+        <div class="info-dot"></div>
+        <span>案例均来自悟空产品真实客户实践，经脱敏处理后归档</span>
+      </div>
+      <div class="info-row">
+        <div class="info-dot"></div>
+        <span>点击柱状图或排行榜可快速筛选对应行业案例</span>
+      </div>
+      <div class="info-row">
+        <div class="info-dot"></div>
+        <span>在「案例浏览」右上角可随时上传新的最佳实践</span>
+      </div>
+      <div class="info-row">
+        <div class="info-dot"></div>
+        <span>案例数据实时更新，看板图表自动同步</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="footer">悟空 · 最佳实践案例库 — 持续更新中</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2 id="drawerTitle"></h2>
+    <button class="drawer-close" id="drawerClose" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- Upload Drawer -->
+<div class="drawer" id="uploadDrawer">
+  <div class="drawer-header">
+    <h2 id="uploadDrawerTitle">上传最佳实践</h2>
+    <button class="drawer-close" onclick="closeUploadDrawer()" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+  <div class="drawer-body upload-drawer-body" id="uploadDrawerBody"></div>
+</div>
+
+<script>
+// ============ CASE DATA ============
+let cases = [
+  {
+    id: 1, title: "智能客服知识库全面升级", client: "某大型商业银行",
+    industry: "金融", scenario: "智能客服",
+    enterpriseBg: "该银行日均客服咨询量超 50 万次，传统 FAQ 机器人意图识别率仅 62%，大量问题需转人工。客服团队 300 人规模，人力成本居高不下。",
+    businessChallenge: "如何在日均 50 万次咨询的高压下，打破传统 FAQ 机器人的局限，实现高精度意图识别和多轮对话，降低人工转接率？",
+    solution: "接入悟空对话引擎，基于 12 万条历史对话记录微调模型；通过知识检索模块对接行内 80+ 业务文档、产品手册和政策文件，构建动态知识库。支持多轮对话、上下文关联和意图澄清。",
+    practiceExampleImg: "", practiceExampleNote: "智能客服对话界面：用户输入模糊问题时，悟空自动进行意图澄清并精准匹配知识库内容",
+    testimonial: "「悟空让我们客服团队真正实现了智能化转型，人工转接率从 38% 降到 9%，客户满意度大幅提升。」—— 该行客服中心负责人",
+    reusableTakeaway: "金融行业智能客服的关键在于知识库的深度和对话引擎的多轮澄清能力。建议优先梳理高频业务场景，用真实对话数据持续迭代模型。",
+    date: "2026-05-28"
+  },
+  {
+    id: 2, title: "维修手册智能检索系统", client: "某新能源汽车制造商",
+    industry: "制造", scenario: "智能检索",
+    enterpriseBg: "售后维修技师需在 5000+ 页维修手册中查找故障解决方案，单次平均耗时 12 分钟。不同车型、年款对应不同维修流程，经常出现查错文档的情况。",
+    businessChallenge: "海量非结构化 PDF 手册导致查找效率极低，技师面对跨车型、跨年款的复杂维修场景难以快速定位正确方案。",
+    solution: "使用悟空文档理解能力，将非结构化 PDF 维修手册解析为结构化知识图谱。技师通过自然语言描述故障现象，悟空跨文档检索并给出对应车型的维修步骤、所需工具和注意事项。",
+    practiceExampleImg: "", practiceExampleNote: "维修检索界面截图：技师输入「Model Y 2024 款空调不制冷」，系统自动返回对应电路图、维修步骤和备件清单",
+    testimonial: "「以前查手册要十几分钟，现在 40 秒就能定位到解决方案。师傅们的效率提升了不止一点。」—— 区域售后技术总监",
+    reusableTakeaway: "制造业文档知识化是 AI 落地的优质场景。非结构化手册解析为结构化知识图谱后，一线人员的使用门槛大幅降低，ROI 显著。",
+    date: "2026-05-29"
+  },
+  {
+    id: 3, title: "AI 导购助手规模化上线", client: "某头部电商平台",
+    industry: "零售电商", scenario: "智能导购",
+    enterpriseBg: "平台日均活跃用户 3000 万，商品 SKU 超 200 万。传统搜索难以满足用户的模糊需求表达，购物决策链路长，用户流失率偏高。",
+    businessChallenge: "如何在 200 万 SKU 的超大规模下，让用户用自然语言就能精准找到想要的商品，缩短决策路径，提升转化率？",
+    solution: "部署悟空对话引擎作为导购助手，支持自然语言商品推荐、多轮需求澄清、比价分析。结合多模态能力，用户可上传图片进行以图搜货和风格匹配。",
+    practiceExampleImg: "", practiceExampleNote: "导购对话示例：「我想买一件适合夏天通勤的连衣裙，不要太正式」，悟空推荐 3 款并主动询问预算区间进行筛选",
+    testimonial: "「导购助手的转化率比传统搜索高 6 个百分点，这是我们今年最成功的 AI 落地项目。」—— 电商平台产品 VP",
+    reusableTakeaway: "电商导购场景下，多轮需求澄清和个性化推荐是核心竞争力。建议初期聚焦高频品类做深度训练，逐步拓展到全品类。",
+    date: "2026-05-30"
+  },
+  {
+    id: 4, title: "病历结构化与智能质控", client: "某三甲医院",
+    industry: "医疗", scenario: "文档质控",
+    enterpriseBg: "日门诊量超 1.2 万人次，病历书写质量参差不齐。质控部门 15 人团队每天仅能抽查 5% 的病历，大量不规范记录未能及时发现和纠正。",
+    businessChallenge: "如何在极高门诊量下，将病历抽查覆盖率从 5% 提升至 100%，同时保证结构化提取和逻辑校验的准确率？",
+    solution: "使用悟空文档理解能力，将手写和语音病历自动结构化为标准字段（主诉、现病史、诊断、治疗方案等）。搭建智能质控工作流，自动检测逻辑矛盾、必填项缺失和用药禁忌。",
+    practiceExampleImg: "", practiceExampleNote: "病历质控界面：原始手写病历→悟空结构化字段→自动质控标记（红色标注逻辑矛盾项）",
+    testimonial: "「以前靠 15 个人每天抽查 5%，现在 AI 能覆盖 100% 病历，诊断矛盾检出率提高了 4 倍。」—— 医院质控科主任",
+    reusableTakeaway: "医疗文本的非结构化程度高，文档理解能力是核心。建议与临床专家紧密合作定义质控规则，确保 AI 输出符合临床实践标准。",
+    date: "2026-05-20"
+  },
+  {
+    id: 5, title: "学术文献智能分析平台", client: "某 985 高校研究团队",
+    industry: "教育", scenario: "文献分析",
+    enterpriseBg: "研究团队在进行系统性文献综述时，需要从 3000+ 篇英文学术论文中提取研究方法和关键结论。传统方式由 6 名研究生人工阅读标注，耗时 3 个月。",
+    businessChallenge: "3000 篇论文的人工标注耗时耗力，如何在保证信息提取准确率的前提下，将几个月的工作压缩到数天内完成？",
+    solution: "使用悟空文档理解能力批量解析 PDF 论文，自动提取研究目的、方法、样本量、结论等结构化信息。通过知识检索实现跨论文对比分析和方法论归类。",
+    practiceExampleImg: "", practiceExampleNote: "文献分析看板：左侧论文列表，中间结构化提取结果，右侧自动生成的方法论对比矩阵",
+    testimonial: "「三个月的工作五天完成，悟空让我们把时间从数据采集转移到深度思考上。」—— 项目首席研究员",
+    reusableTakeaway: "学术文献分析对准确性要求极高，建议采用人机协同模式——悟空完成初筛和结构化，研究人员负责深度分析和判断。",
+    date: "2026-05-22"
+  },
+  {
+    id: 6, title: "政策解读与群众咨询助手", client: "某省会城市政务服务中心",
+    industry: "政务", scenario: "政策咨询",
+    enterpriseBg: "政务大厅每日接待咨询 2000+ 人次，涉及 36 个部门的 500+ 项政策。窗口人员需跨系统查阅多个政策文件，单次解答平均耗时 8 分钟，高峰期排队严重。",
+    businessChallenge: "跨部门、多政策的知识碎片化严重，窗口人员无法快速给出准确一致的政策解答，群众满意度低。",
+    solution: "构建悟空驱动的政策知识库，覆盖社保、公积金、企业注册、税务等高频领域。对话引擎支持群众自然语言提问，精准定位政策条款并给出通俗化解读。",
+    practiceExampleImg: "", practiceExampleNote: "政务服务终端界面：群众输入「我要开一家奶茶店需要办什么证」，悟空给出清单、材料和办理窗口",
+    testimonial: "「以前窗口咨询要 8 分钟，现在群众在自助终端一问就能解决 76% 的问题。」—— 政务服务中心副主任",
+    reusableTakeaway: "政务场景的难点在于政策频繁更新。建议建立政策更新的自动化同步机制，确保知识库始终与最新政策保持一致。",
+    date: "2026-05-18"
+  },
+  {
+    id: 7, title: "AI 辅助代码生成提效", client: "某 B 轮 SaaS 创业公司",
+    industry: "互联网", scenario: "代码生成",
+    enterpriseBg: "公司 45 人研发团队，前端采用 React + TypeScript 技术栈，后端使用 Python/FastAPI。业务需求密集，重复性 CRUD 代码占比高，Code Review 周期长。",
+    businessChallenge: "如何在有限的人力下支撑快速增长的业务需求，减少重复性代码编写时间，同时保障代码质量和一致性？",
+    solution: "全员接入悟空代码助手，支持自然语言描述需求自动生成 TypeScript 类型定义、React 组件和 API 路由代码。定制工作流从 PRD 到代码生成的标准化流程。",
+    practiceExampleImg: "", practiceExampleNote: "VSCode 插件截图：开发者输入需求描述，悟空生成完整的 TypeScript 类型定义和 API 路由代码",
+    testimonial: "「CRUD 接口的开发时间缩短了 65%，团队能集中精力做更有挑战性的架构设计。」—— CTO",
+    reusableTakeaway: "代码生成工具的价值不仅在于速度，更在于统一代码风格和减少低级错误。建议在团队内建立 Prompt 模板库，让不同开发者都能获得一致的生成质量。",
+    date: "2026-05-15"
+  },
+  {
+    id: 8, title: "运单智能识别与自动录入", client: "某头部快递物流企业",
+    industry: "物流", scenario: "运单识别",
+    enterpriseBg: "日均处理手写运单 8 万张，OCR 识别率仅 85%，异常件需人工补录。高峰期补录积压严重，影响转运时效和客户体验。",
+    businessChallenge: "手写运单格式多样、笔迹潦草，传统 OCR 准确率不足，如何在保证高准确率的前提下实现自动化录入？",
+    solution: "使用悟空多模态能力对手写运单进行版面分析加手写体识别。结合工作流模块搭建异常处理链路——低置信度结果自动入池，悟空根据上下文智能补全。",
+    practiceExampleImg: "", practiceExampleNote: "运单识别界面：左侧原始手写运单扫描件，右侧悟空识别结果，低置信度字段黄色高亮标记",
+    testimonial: "「运单处理时效从 4 小时缩短到 30 分钟，客户的投诉电话明显少了。」—— 运营中心负责人",
+    reusableTakeaway: "物流行业多模态能力的典型应用场景。建议建立人机协同的分级处理机制：高置信度自动过、低置信度 AI 辅助补全、极端异常件人工处理。",
+    date: "2026-06-01"
+  },
+  {
+    id: 9, title: "理赔材料智能审核系统", client: "某大型财产保险公司",
+    industry: "金融", scenario: "理赔审核",
+    enterpriseBg: "车险理赔日均处理 3000+ 单，每单需人工审核 8-12 份材料。审核人员 80 人，旺季加班严重，材料真实性甄别依赖个人经验。",
+    businessChallenge: "理赔材料种类繁多、审核规则复杂，如何在保证审核质量的前提下，大幅缩短处理时效并提升欺诈检出率？",
+    solution: "使用悟空文档理解能力自动提取理赔材料中的关键字段。搭建审核工作流：规则引擎初筛，悟空智能校验（交叉比对、金额合理性、历史理赔关联），高风险件人工复核。",
+    practiceExampleImg: "", practiceExampleNote: "理赔审核界面：悟空自动提取关键字段并交叉比对，红色风险标识提示疑似欺诈项",
+    testimonial: "「欺诈检出率提升了 3.2 倍，年减少骗赔损失预估超 800 万元，这个投入太值了。」—— 理赔部总经理",
+    reusableTakeaway: "保险理赔场景下，文档理解+规则引擎+工作流的组合模式可复用性强。建议先在高频险种上验证，再逐步推广至全险种。",
+    date: "2026-05-25"
+  },
+  {
+    id: 10, title: "合同智能审查与风险预警", client: "某全国性律师事务所",
+    industry: "法律", scenario: "合同审查",
+    enterpriseBg: "律所年审合同量超 5000 份，涉及 20+ 行业。初级律师审查一份 50 页的商业合同平均耗时 3 小时，关键条款遗漏风险高，审查质量依赖个人经验。",
+    businessChallenge: "跨行业合同格式差异大、条款复杂度高，如何确保每一份合同的关键条款都被充分审查，消除因经验差异带来的遗漏风险？",
+    solution: "基于悟空文档理解能力，自动解析合同条款结构，识别关键条款（违约责任、知识产权、保密义务、争议解决等）。知识检索模块对比行业标准模板和历史案例，标注风险。",
+    practiceExampleImg: "", practiceExampleNote: "合同审查界面：左侧合同原文，右侧悟空自动标注的风险条款和合规建议",
+    testimonial: "「关键条款遗漏率从 12% 降到了 1.5% 以下，我们的审查产能提升了 3 倍。」—— 律所合伙人",
+    reusableTakeaway: "法律文本对准确率要求极高，建议建立人工复核闭环——AI 初筛标记风险条款，律师终审确认，两者互补才能形成可信赖的法律服务流程。",
+    date: "2026-05-16"
+  },
+  {
+    id: 11, title: "门店运营数据智能分析", client: "某连锁便利店品牌",
+    industry: "零售电商", scenario: "数据分析",
+    enterpriseBg: "全国 3000+ 门店每日产生销售、库存、客流等数据，区域经理需从 Excel 报表中手动分析异常。总部数据分析团队仅 10 人，无法支撑精细化单店运营指导。",
+    businessChallenge: "3000 家门店的海量数据与仅 10 人的总部数据团队形成尖锐矛盾，如何让一线管理者也能自主完成数据分析？",
+    solution: "搭建悟空数据分析平台，区域经理通过自然语言提问，悟空自动查询数据仓库，生成分析报告和可视化图表，并给出初步归因建议。",
+    practiceExampleImg: "", practiceExampleNote: "数据分析问答界面：区域经理输入「上周华东区销售额下降的门店有哪些？原因是什么？」，悟空返回排名+归因分析",
+    testimonial: "「以前等总部出报告要一两天，现在秒级拿到分析结果，异常门店当天就能跟进。」—— 华东区区域经理",
+    reusableTakeaway: "零售数据分析的关键在于让一线人员具备自助分析能力。自然语言交互大幅降低了数据分析的门槛，建议优先覆盖毛利率、库存周转等高频分析场景。",
+    date: "2026-06-02"
+  },
+  {
+    id: 12, title: "质检报告自动生成系统", client: "某精密机械制造企业",
+    industry: "制造", scenario: "报告生成",
+    enterpriseBg: "每条产线每日产生 200+ 份质检数据（仪表读数照片、测量值、检测员笔记），质检员需手工汇总为质检报告，每份报告耗时 30 分钟，格式不统一、易出错。",
+    businessChallenge: "多源异构的质检数据（图片读数+手写笔记+数字测量值）如何实现自动化采集和统一报告生成？",
+    solution: "使用悟空多模态能力识别仪表盘照片中的读数，结合文档理解解析检测员手写笔记。自动汇总数据、计算统计指标，生成标准化质检报告含图表和异常标注。",
+    practiceExampleImg: "", practiceExampleNote: "质检报告生成：左侧多源原始数据，右侧悟空自动生成的标准化质检报告（含统计图表和异常标注）",
+    testimonial: "「30 分钟变 2 分钟，格式 100% 规范，质检员终于不用加班写报告了。」—— 生产质量部部长",
+    reusableTakeaway: "制造业质检场景中，多模态能力是打通「照片读数+手写笔记+数字数据」三种数据源的关键。建议先在一两条产线试点，验证模板后再全面推广。",
+    date: "2026-06-01"
+  }
+];
+
+
+
+// ============ TAB SWITCH ============
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'dashboard') renderDashboard();
+  });
+});
+
+// ============ DASHBOARD RENDER ============
+function getWeekRange() {
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+  monday.setHours(0,0,0,0);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23,59,59,999);
+  return { start: monday.toISOString().slice(0,10), end: sunday.toISOString().slice(0,10) };
+}
+
+function renderDashboard() {
+  // Update stats
+  document.getElementById('dashTotal').textContent = cases.length;
+  const { start, end } = getWeekRange();
+  const thisWeek = cases.filter(c => c.date >= start && c.date <= end);
+  document.getElementById('dashWeekNew').textContent = thisWeek.length;
+  document.getElementById('dashIndustries').textContent = new Set(cases.map(c => c.industry)).size;
+  document.getElementById('dashScenarios').textContent = new Set(cases.map(c => c.scenario)).size;
+
+  // Industry distribution
+  renderChart();
+
+  // Leaderboard
+  renderLeaderboard();
+}
+
+function renderChart() {
+  const container = document.getElementById('chartContainer');
+  const industryCount = {};
+
+  cases.forEach(c => {
+    industryCount[c.industry] = (industryCount[c.industry] || 0) + 1;
+  });
+
+  const sorted = Object.entries(industryCount).sort((a,b) => b[1] - a[1]);
+  const maxVal = sorted[0]?.[1] || 1;
+  const barColors = ['#3B82F6','#6366F1','#8B5CF6','#06B6D4','#10B981','#F59E0B','#EF4444','#EC4899','#84CC16'];
+
+  const chartW = 640, chartH = 260;
+  const padL = 40, padR = 20, padT = 20, padB = 40;
+  const plotW = chartW - padL - padR;
+  const plotH = chartH - padT - padB;
+  const barW = Math.min(plotW / sorted.length * 0.65, 44);
+  const gap = plotW / sorted.length;
+
+  let svg = `<svg id="chartSvg" width="100%" height="${chartH + 20}" viewBox="0 0 ${chartW} ${chartH + 20}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Grid lines
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (plotH / 4) * i;
+    const val = Math.round(maxVal * (1 - i / 4));
+    svg += `<line x1="${padL}" y1="${y}" x2="${padL + plotW}" y2="${y}" stroke="#EEF0F2" stroke-width="1"/>`;
+    svg += `<text x="${padL - 8}" y="${y + 4}" text-anchor="end" fill="#94A3B8" font-size="11" font-family="-apple-system,sans-serif">${val}</text>`;
+  }
+
+  // Bars with tooltip
+  sorted.forEach(([ind, cnt], i) => {
+    const bh = (cnt / maxVal) * plotH;
+    const x = padL + gap * i + (gap - barW) / 2;
+    const y = padT + plotH - bh;
+    const color = barColors[i % barColors.length];
+
+    svg += `<rect id="bar${i}" class="chart-bar" x="${x}" y="${y}" width="${barW}" height="${bh}" rx="4"
+      fill="${color}" opacity="0.85"
+      onmouseover="showTooltip(event,'${ind}：${cnt} 篇',${x + barW/2},${y - 8})"
+      onmouseout="hideTooltip()"
+      onclick="gotoBrowseWithIndustry('${ind.replace(/'/g,"\\'")}')"/>`;
+
+    // Industry label (clickable)
+    svg += `<text x="${x + barW/2}" y="${padT + plotH + 18}" text-anchor="middle" fill="#64748B" font-size="11" font-family="-apple-system,sans-serif" style="cursor:pointer" onclick="gotoBrowseWithIndustry('${ind.replace(/'/g,"\\'")}')">${ind}</text>`;
+
+    // Count on top of bar
+    svg += `<text x="${x + barW/2}" y="${y - 6}" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="700" font-family="-apple-system,sans-serif" style="cursor:pointer" onclick="gotoBrowseWithIndustry('${ind.replace(/'/g,"\\'")}')">${cnt}</text>`;
+  });
+
+  svg += `</svg>`;
+  svg += `<div class="chart-tooltip" id="chartTooltip"></div>`;
+
+  container.innerHTML = svg;
+}
+
+function showTooltip(e, text, x, y) {
+  const tip = document.getElementById('chartTooltip');
+  if (!tip) return;
+  tip.textContent = text;
+  tip.style.left = x + 'px';
+  tip.style.top = y + 'px';
+  tip.classList.add('show');
+}
+
+function hideTooltip() {
+  const tip = document.getElementById('chartTooltip');
+  if (tip) tip.classList.remove('show');
+}
+
+function renderLeaderboard() {
+  const container = document.getElementById('leaderboard');
+  const industryCount = {};
+  cases.forEach(c => { industryCount[c.industry] = (industryCount[c.industry] || 0) + 1; });
+  const sorted = Object.entries(industryCount).sort((a,b) => b[1] - a[1]);
+  const maxVal = sorted[0]?.[1] || 1;
+  const barColors = ['#3B82F6','#6366F1','#8B5CF6','#06B6D4','#10B981','#F59E0B','#EF4444','#EC4899','#84CC16'];
+
+  container.innerHTML = sorted.map(([name, cnt], i) => {
+    const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : 'normal';
+    return `<div class="lb-row" onclick="gotoBrowseWithIndustry('${name.replace(/'/g,"\\'")}')" title="点击查看 ${name} 行业案例">
+      <span class="lb-rank ${rankClass}">${i + 1}</span>
+      <span class="lb-name">${name}</span>
+      <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${(cnt/maxVal*100)}%;background:${barColors[i%barColors.length]}"></div></div>
+      <span class="lb-count">${cnt} 篇</span>
+    </div>`;
+  }).join('');
+}
+
+
+// ============ QUICK UPLOAD FORM ============
+// Industry dropdown options
+const INDUSTRY_OPTIONS = ['金融', '制造', '零售电商', '医疗', '互联网', '物流', '酒旅餐饮', '教育', '政务', '法律', '能源', '农业', '房地产', '其他'];
+
+// ============ UPLOAD DRAWER ============
+let practiceImgData = '';      // base64 of practice example image
+let testimonialAvatarData = ''; // base64 of testimonial avatar
+
+function openUploadDrawer(existingData) {
+  const body = document.getElementById('uploadDrawerBody');
+  const isEdit = !!existingData;
+  practiceImgData = existingData?.practiceExampleImg || '';
+  testimonialAvatarData = existingData?.testimonialAvatar || '';
+
+  body.innerHTML = `
+    <form class="quick-form" id="quickUploadForm" onsubmit="submitCase(event)" style="padding:0;">
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>案例标题 *</label>
+          <input type="text" id="fuTitle" placeholder="简洁描述解决方案" required>
+        </div>
+        <div class="form-group">
+          <label>客户名称 *</label>
+          <input type="text" id="fuClient" placeholder="匿名或公开名称" required>
+        </div>
+      </div>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label>行业 *</label>
+          <select id="fuIndustry" required>
+            <option value="">请选择行业</option>
+            ${INDUSTRY_OPTIONS.map(o => `<option value="${o}">${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>应用场景 *</label>
+          <input type="text" id="fuScenario" placeholder="如：智能客服、文档处理" list="scenarioList" required>
+          <datalist id="scenarioList"></datalist>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>企业背景 *</label>
+        <textarea id="fuEnterpriseBg" placeholder="描述客户的企业背景、业务规模、团队情况等..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>业务挑战 *</label>
+        <textarea id="fuBusinessChallenge" placeholder="客户面临的核心业务问题和技术挑战是什么？" required></textarea>
+      </div>
+      <div class="form-group">
+        <label>悟空解法 *</label>
+        <textarea id="fuSolution" placeholder="悟空如何落地解决问题？具体使用了哪些能力？实施路径是怎样的？" required></textarea>
+      </div>
+      <div class="form-group">
+        <label>实践示例 — 点击上传截图</label>
+        <div class="img-upload-area${practiceImgData ? ' has-image' : ''}" id="fuPracticeImgArea" onclick="document.getElementById('fuPracticeImgFile').click()">
+          <input type="file" id="fuPracticeImgFile" accept="image/*" style="display:none" onchange="handlePracticeImgUpload(this)">
+          ${practiceImgData
+            ? `<img src="${practiceImgData}" alt="实践示例预览"><button type="button" class="img-upload-remove" onclick="event.stopPropagation();removePracticeImg()">&times;</button>`
+            : `<div class="img-upload-placeholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span>点击上传截图或界面示例</span>
+                <small>支持 JPG、PNG、GIF，不超过 5MB</small>
+              </div>`}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>实践示例 — 文字注释</label>
+        <input type="text" id="fuPracticeNote" placeholder="对截图内容的简要说明，如：对话界面示例，左侧用户输入、右侧AI回复">
+      </div>
+      <div class="form-group" style="margin-top:4px;">
+        <label style="padding-bottom:6px;border-bottom:1px solid var(--border-soft);margin-bottom:10px;">人物证言</label>
+        <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+          <div class="img-upload-area avatar${testimonialAvatarData ? ' has-image' : ''}" id="fuAvatarArea" style="flex-shrink:0;" onclick="document.getElementById('fuAvatarFile').click()">
+            <input type="file" id="fuAvatarFile" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+            ${testimonialAvatarData
+              ? `<img src="${testimonialAvatarData}" alt="人物头像"><button type="button" class="img-upload-remove" onclick="event.stopPropagation();removeAvatar()">&times;</button>`
+              : `<div class="img-upload-placeholder" style="padding:20px 12px;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  <span style="font-size:11px;">头像</span>
+                </div>`}
+          </div>
+          <div style="flex:1;min-width:180px;display:flex;flex-direction:column;gap:8px;">
+            <input type="text" id="fuTestimonialName" placeholder="证言人姓名 / 职位" style="font-size:13px;">
+            <textarea id="fuTestimonial" placeholder="客户的真实评价或认可语录&#10;如：「悟空让我们的效率提升了 3 倍。」" style="min-height:68px;font-size:13px;"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>可复用经验 *</label>
+        <textarea id="fuReusableTakeaway" placeholder="从该项目中提炼出的可复制、可推广的方法论和经验教训" required></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">${isEdit ? '保存修改' : '提交并上传'}</button>
+        <button type="button" class="btn btn-outline" onclick="clearUploadForm()">${isEdit ? '取消编辑' : '清空表单'}</button>
+      </div>
+    </form>
+  `;
+  // Populate datalist
+  setTimeout(populateDataLists, 50);
+  // Pre-fill if editing
+  if (existingData) {
+    document.getElementById('uploadDrawerTitle').textContent = '编辑案例';
+    document.getElementById('fuTitle').value = existingData.title || '';
+    document.getElementById('fuClient').value = existingData.client || '';
+    document.getElementById('fuIndustry').value = existingData.industry || '';
+    document.getElementById('fuScenario').value = existingData.scenario || '';
+    document.getElementById('fuEnterpriseBg').value = existingData.enterpriseBg || '';
+    document.getElementById('fuBusinessChallenge').value = existingData.businessChallenge || '';
+    document.getElementById('fuSolution').value = existingData.solution || '';
+    document.getElementById('fuPracticeNote').value = existingData.practiceExampleNote || '';
+    document.getElementById('fuTestimonialName').value = existingData.testimonialName || '';
+    document.getElementById('fuTestimonial').value = existingData.testimonial || '';
+    document.getElementById('fuReusableTakeaway').value = existingData.reusableTakeaway || '';
+  } else {
+    document.getElementById('uploadDrawerTitle').textContent = '上传最佳实践';
+  }
+  // Show drawer
+  document.getElementById('uploadDrawer').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+// ---- Image upload handlers ----
+function handlePracticeImgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('图片大小不能超过 5MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    practiceImgData = e.target.result;
+    // Update preview
+    const area = document.getElementById('fuPracticeImgArea');
+    area.classList.add('has-image');
+    area.innerHTML = `<img src="${practiceImgData}" alt="实践示例预览"><button type="button" class="img-upload-remove" onclick="event.stopPropagation();removePracticeImg()">&times;</button>`;
+    // Re-attach click handler
+    area.onclick = function() { document.getElementById('fuPracticeImgFile').click(); };
+    // Re-create hidden file input
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file'; hiddenInput.id = 'fuPracticeImgFile';
+    hiddenInput.accept = 'image/*'; hiddenInput.style.display = 'none';
+    hiddenInput.onchange = function() { handlePracticeImgUpload(this); };
+    area.appendChild(hiddenInput);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePracticeImg() {
+  practiceImgData = '';
+  const area = document.getElementById('fuPracticeImgArea');
+  area.classList.remove('has-image');
+  area.innerHTML = `
+    <input type="file" id="fuPracticeImgFile" accept="image/*" style="display:none" onchange="handlePracticeImgUpload(this)">
+    <div class="img-upload-placeholder">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <span>点击上传截图或界面示例</span>
+      <small>支持 JPG、PNG、GIF，不超过 5MB</small>
+    </div>`;
+}
+
+function handleAvatarUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) { showToast('头像图片不能超过 3MB', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    testimonialAvatarData = e.target.result;
+    const area = document.getElementById('fuAvatarArea');
+    area.classList.add('has-image');
+    area.innerHTML = `<img src="${testimonialAvatarData}" alt="人物头像"><button type="button" class="img-upload-remove" onclick="event.stopPropagation();removeAvatar()">&times;</button>`;
+    area.onclick = function() { document.getElementById('fuAvatarFile').click(); };
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'file'; hiddenInput.id = 'fuAvatarFile';
+    hiddenInput.accept = 'image/*'; hiddenInput.style.display = 'none';
+    hiddenInput.onchange = function() { handleAvatarUpload(this); };
+    area.appendChild(hiddenInput);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAvatar() {
+  testimonialAvatarData = '';
+  const area = document.getElementById('fuAvatarArea');
+  area.classList.remove('has-image');
+  area.innerHTML = `
+    <input type="file" id="fuAvatarFile" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+    <div class="img-upload-placeholder" style="padding:20px 12px;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span style="font-size:11px;">头像</span>
+    </div>`;
+}
+
+function closeUploadDrawer() {
+  document.getElementById('uploadDrawer').classList.remove('show');
+  // Check if detail drawer is also open
+  const drawerOpen = document.getElementById('drawer').classList.contains('show');
+  if (!drawerOpen) {
+    document.getElementById('overlay').classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  // Reset edit state
+  editingCaseId = null;
+}
+
+function populateDataLists() {
+  const scenarios = [...new Set(cases.map(c => c.scenario))].sort();
+  const sl = document.getElementById('scenarioList');
+  if (sl) sl.innerHTML = scenarios.map(s => `<option value="${s}">`).join('');
+}
+
+function submitCase(e) {
+  e.preventDefault();
+  const title = document.getElementById('fuTitle').value.trim();
+  const client = document.getElementById('fuClient').value.trim();
+  const industry = document.getElementById('fuIndustry').value.trim();
+  const scenario = document.getElementById('fuScenario').value.trim();
+  const enterpriseBg = document.getElementById('fuEnterpriseBg').value.trim();
+  const businessChallenge = document.getElementById('fuBusinessChallenge').value.trim();
+  const solution = document.getElementById('fuSolution').value.trim();
+  const practiceExampleNote = document.getElementById('fuPracticeNote').value.trim();
+  const testimonialName = document.getElementById('fuTestimonialName').value.trim();
+  const testimonial = document.getElementById('fuTestimonial').value.trim();
+  const reusableTakeaway = document.getElementById('fuReusableTakeaway').value.trim();
+
+  if (!title || !client || !industry || !scenario || !enterpriseBg || !businessChallenge || !solution || !reusableTakeaway) {
+    showToast('请填写所有必填字段', 'error');
+    return;
+  }
+
+  const wasEdit = !!editingCaseId;
+  if (editingCaseId) {
+    const idx = cases.findIndex(c => c.id === editingCaseId);
+    if (idx !== -1) {
+      cases[idx] = {
+        ...cases[idx],
+        title, client, industry, scenario,
+        enterpriseBg, businessChallenge, solution,
+        practiceExampleImg: practiceImgData,
+        practiceExampleNote,
+        testimonialAvatar: testimonialAvatarData,
+        testimonialName,
+        testimonial,
+        reusableTakeaway
+      };
+    }
+    editingCaseId = null;
+  } else {
+    const newCase = {
+      id: Math.max(...cases.map(c => c.id), 0) + 1,
+      title, client, industry, scenario,
+      enterpriseBg, businessChallenge, solution,
+      practiceExampleImg: practiceImgData,
+      practiceExampleNote,
+      testimonialAvatar: testimonialAvatarData,
+      testimonialName,
+      testimonial,
+      reusableTakeaway,
+      date: new Date().toISOString().slice(0, 10)
+    };
+    cases.unshift(newCase);
+  }
+
+  // Close upload drawer
+  closeUploadDrawer();
+  document.getElementById('overlay').classList.remove('show');
+  document.body.style.overflow = '';
+
+  showToast(wasEdit ? '案例已更新' : '案例已成功上传并同步至案例库', 'success');
+
+  // Refresh all views
+  const chartSvg = document.getElementById('chartSvg');
+  if (chartSvg) { chartSvg.remove(); }
+  renderDashboard();
+  buildFilterTags();
+  updateFilterUI();
+  renderCases();
+
+  // Navigate to browse tab if on dashboard
+  const browseBtn = document.querySelector('.tab-btn[data-tab="browse"]');
+  const dashBtn = document.querySelector('.tab-btn[data-tab="dashboard"]');
+  if (dashBtn && dashBtn.classList.contains('active')) {
+    dashBtn.classList.remove('active');
+    if (browseBtn) browseBtn.classList.add('active');
+    document.getElementById('tab-dashboard').classList.remove('active');
+    document.getElementById('tab-browse').classList.add('active');
+  }
+
+  // Scroll to top so user sees the new case
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function clearUploadForm() {
+  editingCaseId = null;
+  practiceImgData = '';
+  testimonialAvatarData = '';
+  const form = document.getElementById('quickUploadForm');
+  if (form) form.reset();
+  // Reset drawer title
+  const titleEl = document.getElementById('uploadDrawerTitle');
+  if (titleEl) titleEl.textContent = '上传最佳实践';
+}
+
+function showToast(msg, type) {
+  const existing = document.querySelector('.form-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = `form-toast ${type}`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 2800);
+}
+
+// ============ DASHBOARD → BROWSE NAVIGATION ============
+function gotoBrowseWithIndustry(industryName) {
+  // Reset all filters and search
+  activeFilters = { industry: new Set([industryName]), scenario: new Set() };
+  const si = document.getElementById('searchInput');
+  if (si) si.value = '';
+
+  // Switch to browse tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const browseBtn = document.querySelector('.tab-btn[data-tab="browse"]');
+  if (browseBtn) browseBtn.classList.add('active');
+  document.getElementById('tab-browse').classList.add('active');
+
+  // Rebuild filter tags with active state and render
+  buildFilterTags();
+  updateFilterUI();
+  renderCases();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============ BROWSE TAB LOGIC ============
+let activeFilters = { industry: new Set(), scenario: new Set() };
+
+function init() {
+  populateDataLists();
+  buildFilterTags();
+  renderCases();
+  renderDashboard();
+  bindEvents();
+}
+
+function buildFilterTags() {
+  const extract = (key) => {
+    const s = new Set();
+    cases.forEach(c => {
+      const v = c[key];
+      Array.isArray(v) ? v.forEach(x => s.add(x)) : s.add(v);
+    });
+    return [...s].sort();
+  };
+  renderFilterGroup('industryFilters', extract('industry'), 'industry');
+  renderFilterGroup('scenarioFilters', extract('scenario'), 'scenario');
+}
+
+function renderFilterGroup(cId, values, cat) {
+  const el = document.getElementById(cId);
+  if (!el) return;
+  el.querySelector('.filter-tags').innerHTML =
+    values.map(v => `<span class="tag" data-category="${cat}" data-value="${v}">${v}</span>`).join('');
+}
+
+function getFiltered() {
+  const input = document.getElementById('searchInput');
+  const q = input ? input.value.trim().toLowerCase() : '';
+  return cases.filter(c => {
+    if (q && ![c.title,c.client,c.enterpriseBg,c.businessChallenge,c.solution,c.reusableTakeaway].join(' ').toLowerCase().includes(q)) return false;
+    if (activeFilters.industry.size && !activeFilters.industry.has(c.industry)) return false;
+    if (activeFilters.scenario.size && !activeFilters.scenario.has(c.scenario)) return false;
+    return true;
+  });
+}
+
+function renderCases() {
+  const filtered = getFiltered();
+  const g = document.getElementById('casesGrid');
+  if (!g) return;
+
+  const tc = document.getElementById('totalCount');
+  const ic = document.getElementById('industryCount');
+  const sc = document.getElementById('scenarioCount');
+  if (tc) tc.textContent = filtered.length;
+  if (ic) ic.textContent = new Set(filtered.map(c => c.industry)).size;
+  if (sc) sc.textContent = new Set(filtered.map(c => c.scenario)).size;
+  const rn = document.getElementById('resultNum');
+  if (rn) rn.textContent = filtered.length;
+
+  const hasFilters = activeFilters.industry.size || activeFilters.scenario.size;
+  const fr = document.getElementById('filterReset');
+  if (fr) fr.classList.toggle('hidden', !hasFilters);
+
+  if (!filtered.length) {
+    g.innerHTML = `<div class="empty-state">
+      <div class="empty-state-box">—</div>
+      <h3>没有匹配的案例</h3>
+      <p>试试调整搜索关键词或清除筛选条件</p>
+    </div>`;
+    return;
+  }
+
+  g.innerHTML = filtered.map(c => `
+    <div class="case-card" data-id="${c.id}">
+      <div class="card-actions">
+        <button class="card-act-btn edit" onclick="event.stopPropagation();editCase(${c.id})" title="编辑">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <button class="card-act-btn del" onclick="event.stopPropagation();deleteCase(${c.id})" title="删除">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+        </button>
+      </div>
+      <div class="card-top" onclick="openDrawer(${c.id})">
+        <span class="card-industry">${c.industry}</span>
+        <span class="card-id">#${String(c.id).padStart(2,'0')}</span>
+      </div>
+      <div class="card-title" onclick="openDrawer(${c.id})" style="cursor:pointer">${c.title}</div>
+      <div class="card-client" onclick="openDrawer(${c.id})" style="cursor:pointer">${c.client}</div>
+      <div class="card-divider"></div>
+      <div class="card-summary" onclick="openDrawer(${c.id})" style="cursor:pointer">${c.enterpriseBg}</div>
+      <div class="card-tags" onclick="openDrawer(${c.id})" style="cursor:pointer">
+        <span class="card-tag">${c.scenario}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDrawer(id) {
+  const c = cases.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('drawerTitle').textContent = c.title;
+  document.getElementById('drawerBody').innerHTML = `
+    <div class="d-meta">
+      <span class="d-meta-tag industry">${c.industry}</span>
+      <span class="d-meta-tag scenario">${c.scenario}</span>
+    </div>
+    <div class="d-block"><div class="d-label">客户</div><div class="d-text">${c.client}</div></div>
+    <div class="d-block"><div class="d-label">企业背景</div><div class="d-text">${c.enterpriseBg}</div></div>
+    <div class="d-block"><div class="d-label">业务挑战</div><div class="d-text">${c.businessChallenge || '—'}</div></div>
+    <div class="d-block"><div class="d-label">悟空解法</div>
+      <ul class="d-list">${c.solution.split('。').filter(s=>s.trim()).map(s=>`<li>${s.trim()}。</li>`).join('')}</ul>
+    </div>
+    ${c.practiceExampleImg
+      ? `<div class="d-block"><div class="d-label">实践示例</div><div class="d-screenshot has-image"><img src="${c.practiceExampleImg}" alt="实践示例"></div>${c.practiceExampleNote ? `<div class="d-text" style="margin-top:10px;color:var(--text-dim);font-size:13px;">${c.practiceExampleNote}</div>` : ''}</div>`
+      : `<div class="d-block"><div class="d-label">实践示例</div><div class="d-text" style="padding:40px 20px;text-align:center;border:1.5px dashed var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text-muted);">${c.practiceExampleNote || '图片示例 — 上传截图后显示'}</div></div>`}
+    ${(c.testimonial || c.testimonialName) ? `<div class="d-block"><div class="d-label">人物证言</div><div class="d-highlight">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        ${c.testimonialAvatar ? `<div style="width:48px;height:48px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--border-soft);"><img src="${c.testimonialAvatar}" alt="${c.testimonialName || '证言人'}" style="width:100%;height:100%;object-fit:cover;"></div>` : ''}
+        <div>
+          ${c.testimonial ? `<div class="d-text" style="font-style:italic;margin-bottom:${c.testimonialName ? '6px' : '0'};">${c.testimonial}</div>` : ''}
+          ${c.testimonialName ? `<div style="font-size:12.5px;font-weight:600;color:var(--accent);">—— ${c.testimonialName}</div>` : ''}
+        </div>
+      </div>
+    </div></div>` : ''}
+    <div class="d-block"><div class="d-label">可复用经验</div>
+      <div class="d-highlight"><div class="d-text">${c.reusableTakeaway}</div></div>
+    </div>
+  `;
+  document.getElementById('drawerBody').scrollTop = 0;
+  document.getElementById('drawer').classList.add('show');
+  document.getElementById('overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ============ EDIT & DELETE ============
+let editingCaseId = null;
+
+function editCase(id) {
+  const c = cases.find(x => x.id === id);
+  if (!c) return;
+  editingCaseId = id;
+  openUploadDrawer(c);
+}
+
+function deleteCase(id) {
+  const c = cases.find(x => x.id === id);
+  if (!c) return;
+  showConfirm(
+    `确认删除「${c.title}」？`,
+    `此操作不可撤销，该案例将从案例库中永久移除。`,
+    () => {
+      cases = cases.filter(x => x.id !== id);
+      buildFilterTags();
+      updateFilterUI();
+      renderCases();
+      // Reset dashboard so it re-renders fresh
+      const chartSvg = document.getElementById('chartSvg');
+      if (chartSvg) { chartSvg.remove(); }
+      renderDashboard();
+      showToast('案例已删除', 'success');
+    }
+  );
+}
+
+function showConfirm(title, message, onConfirm) {
+  // Remove existing
+  const existing = document.querySelector('.confirm-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <h3>${title}</h3>
+      <p>${message}</p>
+      <div class="confirm-actions">
+        <button class="btn-cancel" id="confirmCancel">取消</button>
+        <button class="btn-danger" id="confirmOk">确认删除</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+
+  overlay.querySelector('#confirmCancel').onclick = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 240);
+  };
+  overlay.querySelector('#confirmOk').onclick = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 240);
+    onConfirm();
+  };
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('show');
+      setTimeout(() => overlay.remove(), 240);
+    }
+  });
+}
+
+
+function toggleFilter(cat, val) {
+  const s = activeFilters[cat];
+  s.has(val) ? s.delete(val) : s.add(val);
+  updateFilterUI();
+  closeUploadDrawer();
+  renderCases();
+}
+
+function clearAllFilters() {
+  activeFilters = { industry: new Set(), scenario: new Set() };
+  const si = document.getElementById('searchInput');
+  if (si) si.value = '';
+  updateFilterUI();
+  closeUploadDrawer();
+  renderCases();
+}
+
+function updateFilterUI() {
+  document.querySelectorAll('.tag').forEach(t => {
+    t.classList.toggle('active', activeFilters[t.dataset.category].has(t.dataset.value));
+  });
+}
+
+function bindEvents() {
+  const si = document.getElementById('searchInput');
+  if (si) si.addEventListener('input', renderCases);
+  const fs = document.getElementById('filterSection');
+  if (fs) {
+    fs.addEventListener('click', e => {
+      const tag = e.target.closest('.tag');
+      if (tag) toggleFilter(tag.dataset.category, tag.dataset.value);
+    });
+  }
+  const dc = document.getElementById('drawerClose');
+  if (dc) dc.addEventListener('click', closeDrawer);
+  const ov = document.getElementById('overlay');
+  if (ov) ov.addEventListener('click', () => { closeDrawer(); closeUploadDrawer(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawer(); closeUploadDrawer(); } });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
